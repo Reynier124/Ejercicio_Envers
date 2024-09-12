@@ -1,32 +1,50 @@
 package org.example;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
+
+import javax.naming.Name;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "articulo")
+@Data
+@AllArgsConstructor
+@Builder
+@Audited
 public class Articulo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "cantidad")
     private int cantidad;
+
+    @Column(name = "denominacion")
     private String denominacion;
+
+    @Column(name = "precio")
     private int precio;
 
+    @OneToMany(mappedBy = "articulo", cascade = CascadeType.PERSIST)
+    @Builder.Default
+    private List<DetalleFactura> detalle = new ArrayList<DetalleFactura>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     @JoinTable(name = "articulo_categoria",
             joinColumns = @JoinColumn(name = "articulo_id"),
-            inverseJoinColumns = @JoinColumn(name = "categoria_id")
-
-
-    )
-
-    private Set<Categoria> categorias= new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "categoria_id"))
+    @Builder.Default
+    private List<Categoria> categorias = new ArrayList<Categoria>();
 
     public Articulo() {
     }
@@ -37,53 +55,6 @@ public class Articulo implements Serializable {
         this.precio = precio;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public String getDeniminacion() {
-        return denominacion;
-    }
-
-    public void setDeniminacion(String deniminacion) {
-        this.denominacion = deniminacion;
-    }
-
-    public int getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(int precio) {
-        this.precio = precio;
-    }
-
-    public String getDenominacion() {
-        return denominacion;
-    }
-
-    public void setDenominacion(String denominacion) {
-        this.denominacion = denominacion;
-    }
-
-    public Set<Categoria> getCategorias() {
-        return categorias;
-    }
-
-    public void setCategorias(Set<Categoria> categorias) {
-        this.categorias = categorias;
-    }
 }
 
 

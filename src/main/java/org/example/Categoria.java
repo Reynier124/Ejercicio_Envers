@@ -1,49 +1,35 @@
 package org.example;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Data
+@AllArgsConstructor
+@Builder
+@Audited
 public class Categoria implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "denominacion")
     private String denominacion;
-// NO PERMITO EL REMOVE
-   @ManyToMany(mappedBy = "categorias")
-    private Set<Articulo> articulos = new HashSet<>();
 
-    public Categoria() {
-    }
+   @ManyToMany(mappedBy = "categorias")
+   @Builder.Default
+    private Set<Articulo> articulos = new HashSet<>();
 
     public Categoria(String denominacion) {
         this.denominacion = denominacion;
-    }
-
-    public String getDenominacion() {
-        return denominacion;
-    }
-
-    public void setDenominacion(String denominacion) {
-        this.denominacion = denominacion;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Set<Articulo> getArticulos() {
-        return articulos;
-    }
-
-    public void setArticulos(Set<Articulo> articulos) {
-        this.articulos = articulos;
     }
 }

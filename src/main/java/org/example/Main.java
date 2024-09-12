@@ -3,6 +3,7 @@ package org.example;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,64 +15,72 @@ public class Main {
             //
             em.getTransaction().begin();
 
-            Categoria carnes = new Categoria("Carnes");
+            Factura factura1 = new Factura();
 
-            Categoria lacteos = new Categoria("Lacteos");
+            factura1.setNumero(12);
+            factura1.setFecha("10/08/2020");
 
-            Categoria limpieza = new Categoria("Limpieza");
+            Domicilio dom = Domicilio.builder().nombreCalle("San Martin").numero(1222).build();
+            Cliente cliente = Cliente.builder().nombre("Pablo").apellido("Muñoz").dni(15245732).build();
+            cliente.setDomicilio(dom);
+            dom.setCliente(cliente);
 
-            Articulo crema = new Articulo(3,"Crema de Leche",1850);
+            factura1.setCliente(cliente);
 
-            Articulo detergente = new Articulo(4,"Lavandina",3600);
+            Categoria carnes = Categoria.builder().denominacion("Carnes").build();
+            Categoria lacteos = Categoria.builder().denominacion("Lacteos").build();
+            Categoria limpieza = Categoria.builder().denominacion("Limpieza").build();
 
-            crema.getCategorias().add(carnes);
-            crema.getCategorias().add(lacteos);
+            Articulo art1 = Articulo.builder()
+                    .cantidad(200)
+                    .denominacion("Yogurt Ser sabor frutilla")
+                    .precio(20)
+                    .build();
 
-            lacteos.getArticulos().add(crema);
-            carnes.getArticulos().add(crema);
-            detergente.getCategorias().add(limpieza);
-            limpieza.getArticulos().add(detergente);
+            Articulo art2 = Articulo.builder()
+                    .cantidad(300)
+                    .denominacion("Detergente Magistral")
+                    .precio(80)
+                    .build();
 
+            art1.getCategorias().add(carnes);
+            art1.getCategorias().add(lacteos);
+            lacteos.getArticulos().add(art1);
 
-            Factura fac1 = new Factura("14/10/2024", 35);
+            art2.getCategorias().add(limpieza);
+            limpieza.getArticulos().add(art2);
 
-            Cliente cliente = new Cliente("Juan", "Gutierrez", 44058201);
-            Domicilio domicilio = new Domicilio("Huarpes",517);
+            DetalleFactura det1 = DetalleFactura.builder()
+                    .articulo(art1)
+                    .cantidad(2)
+                    .subtotal(40)
+                    .build();
 
-            cliente.setDomicilio(domicilio);
+            art1.getDetalle().add(det1);
+            factura1.getDetalles().add(det1);
+            det1.setFactura(factura1);
 
-            fac1.setCliente(cliente);
+            DetalleFactura det2 = DetalleFactura.builder()
+                    .articulo(art2)
+                    .cantidad(1)
+                    .subtotal(80)
+                    .build();
 
-            DetalleFactura linea1 = new DetalleFactura();
+            art2.getDetalle().add(det2);
+            factura1.getDetalles().add(det2);
+            det2.setFactura(factura1);
 
-            linea1.setArticulo(crema);
-            linea1.setCantidad(6);
-            linea1.setSubtotal(11100);
+            factura1.setTotal(120);
 
-            fac1.getFacturas().add(linea1);
-
-            DetalleFactura linea2 = new DetalleFactura();
-
-            linea2.setArticulo(detergente);
-            linea2.setCantidad(1);
-            linea2.setSubtotal(50);
-
-            fac1.getFacturas().add(linea2);
-
-            em.persist(fac1);
-
-
+            em.persist(factura1);
             em.flush();
-
+            em.flush();
             em.getTransaction().commit();
-
-
 
         }catch (Exception e){
 
             em.getTransaction().rollback();
-            System.out.println(e.getMessage());
-            System.out.println("No se pudo grabar la clase Factura");}
+            System.out.println("Ha ocurrido un error: " + e.getMessage());}
 
 
         em.close();
